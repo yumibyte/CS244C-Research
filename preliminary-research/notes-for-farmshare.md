@@ -1,6 +1,9 @@
 ## SSH into farmshare
 `ssh raigosa@login.farmshare.stanford.edu`
 
+### Good to know functions for farmshare
+View resources I've queued: `squeue -u raigosa`
+
 ## Requesting nodes on farmshare
 `srun --partition=gpu --gres=gpu:2 --nodes=1 --pty bash`
 provides the following result for `nvidia-smi`:
