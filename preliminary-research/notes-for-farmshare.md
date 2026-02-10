@@ -71,6 +71,9 @@ NIC Legend:
 
 ### To actually run the experiment
 
+*Use micromamba*
+`micromamba activate nccl-env`
+
 *This is with MPI, I got some header issues and we should consider whether we want to use MPI later...*
 `make MPI=1 CUDA_HOME="$CUDA_HOME" NCCL_HOME="$NCCL_HOME"`
 

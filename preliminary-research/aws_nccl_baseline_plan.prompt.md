@@ -1,5 +1,11 @@
 # NCCL Performance Baseline and Analysis on AWS
 
+# Files used to generate this report:
+- preliminary-research/plot_nccl_bw.py
+- preliminary-research/plot_nccl_latency.py
+- preliminary-research/aws_nccl_baseline_plan.prompt.md
+- results_2gpu_allreduce.txt
+
 ## Overview
 This plan outlines how to:
 1. Set up a cost-effective AWS GPU cluster for NCCL benchmarking.
@@ -41,19 +47,3 @@ This plan outlines how to:
 - Highlight regions where performance drops or latency spikes.
 - Annotate graphs to indicate potential areas for NCCL tuning or algorithm changes.
 
-## Testing
-- Confirm instance launches and GPUs are visible.
-- Validate `nccl-tests` runs successfully for all desired message sizes.
-- Check that output files are correctly generated and parsed.
-- Ensure graphs accurately reflect the data and highlight performance trends.
-
-## Assumptions & Notes
-- Spot instances may be interrupted; save results frequently.
-- Deep Learning AMI simplifies setup but can use Ubuntu with manual CUDA/NCCL install.
-- Multi-GPU tests require appropriate instance types and may incur higher costs.
-
-## Deliverables
-- Step-by-step AWS setup instructions.
-- Baseline measurement script (shell or Python) for AllReduce only.
-- Example output files and Python plotting script.
-- Sample graphs with analysis notes.
