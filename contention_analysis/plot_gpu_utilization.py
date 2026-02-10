@@ -2,10 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def main():
-    csv_file = 'gpu_utilization_log.csv'
+    import os
+    csv_file = './gpu_utilization_logs/gpu_utilization_log_high.csv'
     df = pd.read_csv(csv_file)
     # Clean up whitespace in memory_used
-    # Robustly convert memory_used to int, handling both string and integer types
     df['memory_used'] = df['memory_used'].apply(lambda x: int(str(x).strip()))
 
     # Plot with dual y-axes
@@ -16,6 +16,10 @@ def main():
     l1, = ax1.plot(df['timestamp'], df['gpu_utilization'], color=color1, marker='o', label='GPU Utilization (%)')
     ax1.tick_params(axis='y', labelcolor=color1)
     ax1.grid(True)
+    # Adjust y-axis if utilization is low
+    max_util = df['gpu_utilization'].max()
+    if max_util < 10:
+        ax1.set_ylim(0, 5)
 
     ax2 = ax1.twinx()
     color2 = 'tab:orange'
@@ -29,7 +33,17 @@ def main():
     labels = [line.get_label() for line in lines]
     ax1.legend(lines, labels, loc='upper left')
     plt.tight_layout()
-    plt.savefig('gpu_utilization_plot.png')
+
+    # Derive output filename from input CSV
+    base = os.path.basename(csv_file)
+    if base.startswith('gpu_utilization_log_') and base.endswith('.csv'):
+        suffix = base[len('gpu_utilization_log_'):-len('.csv')]
+        plot_name = f'gpu_utilization_plot_{suffix}.png'
+    else:
+        plot_name = 'gpu_utilization_plot.png'
+    outdir = os.path.dirname(csv_file)
+    save_path = os.path.join(outdir, plot_name)
+    plt.savefig(save_path)
     plt.show()
 
 if __name__ == '__main__':
