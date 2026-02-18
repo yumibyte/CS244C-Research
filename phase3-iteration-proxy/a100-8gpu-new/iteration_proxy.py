@@ -60,6 +60,7 @@ def main():
 
     # Timed iterations
     times_ms = []
+    reward_file = os.environ.get("NCCL_TUNER_REWARD_FILE", "")
     for _ in range(args.iters):
         torch.cuda.synchronize()
         t0 = time.perf_counter()
@@ -67,7 +68,19 @@ def main():
         allreduce_phase(grad.clone())
         torch.cuda.synchronize()
         t1 = time.perf_counter()
-        times_ms.append((t1 - t0) * 1000.0)
+        iter_ms = (t1 - t0) * 1000.0
+        times_ms.append(iter_ms)
+
+        # If an RL tuner reward file is configured, log one reward per iteration
+        # from rank 0 so the tuner can learn online.
+        if reward_file and rank == 0:
+            try:
+                n_bytes = elem * 4  # float32 elements
+                with open(reward_file, "a") as f:
+                    f.write(f"allreduce,{n_bytes},{1},{world_size},{iter_ms:.3f}\n")
+            except OSError:
+                # Best-effort: ignore logging errors so experiments still run.
+                pass
 
     if rank == 0:
         out_lines = [f"{t:.3f}" for t in times_ms]
