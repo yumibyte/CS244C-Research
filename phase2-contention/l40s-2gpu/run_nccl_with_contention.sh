@@ -33,7 +33,7 @@ mkdir -p "$OUTDIR"
 # Run NCCL all_reduce_perf
 echo "Running NCCL all_reduce_perf..."
 OUTFILE="$OUTDIR/results_2gpu_allreduce_contended_${CONTENTION}.txt"
-../nccl-tests/build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 | tee "$OUTFILE"
+../../nccl-tests/build/all_reduce_perf -b 8 -e 128M -f 2 -g 2 | tee "$OUTFILE"
 
 # Kill the GPU stress benchmark after NCCL test finishes
 echo "Killing GPU stress benchmark..."

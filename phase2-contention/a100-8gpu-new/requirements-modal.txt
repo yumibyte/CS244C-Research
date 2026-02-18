@@ -1,0 +1,5 @@
+# For running run_modal.py (Modal Labs)
+# pip install -r requirements-modal.txt
+# modal token set   # once
+# modal run run_modal.py
+modal>=0.64.0

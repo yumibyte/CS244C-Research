@@ -13,4 +13,4 @@ Show that bandwidth-optimal NCCL tuning does not necessarily minimize iteration 
 
 ## Status
 
-Not started.
+- **A100 8-GPU (Modal)**: Implemented in `a100-8gpu-new/` — training-step proxy (compute → all-reduce), run under NCCL configs AUTO / Simple / LL128; outputs iteration times to `results/`. Run with `modal run run_modal.py` from `a100-8gpu-new/`.
