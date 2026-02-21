@@ -1,0 +1,42 @@
+# nccl-tests version 2.17.9 nccl-headers=22902 nccl-library=22902
+# Collective test starting: all_reduce_perf
+# nThread 1 nGpus 2 minBytes 8 maxBytes 134217728 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 4100044 on     oat-02 device  0 [0000:4a:00] NVIDIA L40S
+#  Rank  1 Group  0 Pid 4100044 on     oat-02 device  1 [0000:61:00] NVIDIA L40S
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+           8             2     float     sum      -1     9.03    0.00    0.00       0     8.85    0.00    0.00       0
+          16             4     float     sum      -1    10.67    0.00    0.00       0     8.76    0.00    0.00       0
+          32             8     float     sum      -1     9.02    0.00    0.00       0     8.81    0.00    0.00       0
+          64            16     float     sum      -1     9.29    0.01    0.01       0     9.11    0.01    0.01       0
+         128            32     float     sum      -1     8.77    0.01    0.01       0     9.04    0.01    0.01       0
+         256            64     float     sum      -1     9.02    0.03    0.03       0     8.69    0.03    0.03       0
+         512           128     float     sum      -1     8.82    0.06    0.06       0     8.84    0.06    0.06       0
+        1024           256     float     sum      -1     8.79    0.12    0.12       0     8.92    0.11    0.11       0
+        2048           512     float     sum      -1     8.83    0.23    0.23       0     8.88    0.23    0.23       0
+        4096          1024     float     sum      -1     8.66    0.47    0.47       0     8.72    0.47    0.47       0
+        8192          2048     float     sum      -1     8.90    0.92    0.92       0     8.82    0.93    0.93       0
+       16384          4096     float     sum      -1     9.43    1.74    1.74       0     9.34    1.75    1.75       0
+       32768          8192     float     sum      -1    11.83    2.77    2.77       0    11.64    2.81    2.81       0
+       65536         16384     float     sum      -1    16.66    3.93    3.93       0    16.17    4.05    4.05       0
+      131072         32768     float     sum      -1    26.28    4.99    4.99       0    25.58    5.12    5.12       0
+      262144         65536     float     sum      -1    40.46    6.48    6.48       0    40.31    6.50    6.50       0
+      524288        131072     float     sum      -1    54.17    9.68    9.68       0    54.32    9.65    9.65       0
+     1048576        262144     float     sum      -1    87.96   11.92   11.92       0    88.28   11.88   11.88       0
+     2097152        524288     float     sum      -1   168.38   12.46   12.46       0   167.89   12.49   12.49       0
+     4194304       1048576     float     sum      -1   295.41   14.20   14.20       0   296.36   14.15   14.15       0
+     8388608       2097152     float     sum      -1   567.64   14.78   14.78       0   571.81   14.67   14.67       0
+    16777216       4194304     float     sum      -1  1113.55   15.07   15.07       0  1112.27   15.08   15.08       0
+    33554432       8388608     float     sum      -1  2191.25   15.31   15.31       0  2200.07   15.25   15.25       0
+    67108864      16777216     float     sum      -1  4353.11   15.42   15.42       0  4357.22   15.40   15.40       0
+   134217728      33554432     float     sum      -1  8699.93   15.43   15.43       0  8710.89   15.41   15.41       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 5.84225 
+#
+# Collective test concluded: all_reduce_perf
+#
+

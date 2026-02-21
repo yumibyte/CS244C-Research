@@ -1,9 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import os
+import sys
 def main():
-    import os
-    csv_file = './gpu_utilization_logs/gpu_utilization_log_high.csv'
+    if len(sys.argv) < 2:
+        print("Usage: python plot_gpu_utilization.py <csv_file>")
+        sys.exit(1)
+    csv_file = sys.argv[1]
     df = pd.read_csv(csv_file)
     # Clean up whitespace in memory_used
     df['memory_used'] = df['memory_used'].apply(lambda x: int(str(x).strip()))
