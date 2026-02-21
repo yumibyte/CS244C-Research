@@ -6,6 +6,7 @@ Produces output in the same format as L40S results for plot_nccl_bw.py.
 
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 
 import modal
@@ -37,15 +38,9 @@ VOLUME_PATH = "/results"
 app = modal.App("browser-networking-tests")
 
 
-@app.function(
-    name="browser-networking-test",
-    image=nccl_image,
-    gpu="A100:8",
-    timeout=3600,
-    volumes={VOLUME_PATH: volume},
-)
-def run_nccl_allreduce_8gpu():
-    """Build nccl-tests and run all_reduce_perf with 8 GPUs (8B–128MB, factor 2)."""
+
+def run_nccl_allreduce_ngpu(num_gpus):
+    """Build nccl-tests and run all_reduce_perf with specified number of GPUs (8B–128MB, factor 2)."""
     nccl_tests = Path("/repo/nccl-tests")
     if not nccl_tests.is_dir():
         raise RuntimeError(
@@ -68,13 +63,13 @@ def run_nccl_allreduce_8gpu():
     if not binary.exists():
         raise RuntimeError(f"Build failed: {binary} not found")
 
-    # Same flags as L40S (see run-baseline-tutorial.md) but -g 8
+    # Same flags as L40S (see run-baseline-tutorial.md) but -g <num_gpus>
     cmd = [
         str(binary),
         "-b", "8",
         "-e", "128M",
         "-f", "2",
-        "-g", "8",
+        "-g", str(num_gpus),
     ]
     env = {
         **__import__("os").environ,
@@ -101,25 +96,45 @@ def run_nccl_allreduce_8gpu():
         raise RuntimeError(f"all_reduce_perf exited {result.returncode}")
 
     # Write to volume
-    out_file = "results_8gpu_allreduce.txt"
+    out_file = f"results_{num_gpus}gpu_allreduce.txt"
     vol_file = Path(VOLUME_PATH) / out_file
     vol_file.parent.mkdir(parents=True, exist_ok=True)
     vol_file.write_text(stdout)
     volume.commit()
 
-    # Print so user can copy to results/results_8gpu_allreduce.txt locally
-    print("=== NCCL output (save to results/results_8gpu_allreduce.txt) ===")
+    # Print so user can copy to results/results_{num_gpus}gpu_allreduce.txt locally
+    print(f"=== NCCL output (save to results/results_{num_gpus}gpu_allreduce.txt) ===")
     print(stdout)
     print("=== end ===")
     return stdout
+
+def get_modal_gpu_string(arch, num_gpus):
+    return f"{arch}:{num_gpus}" if num_gpus > 0 else f"{arch}:1"
+
+def make_modal_function(arch, num_gpus):
+    return app.function(
+        name="browser-networking-test",
+        image=nccl_image,
+        gpu=get_modal_gpu_string(arch, num_gpus),
+        timeout=3600,
+        volumes={VOLUME_PATH: volume},
+    )(lambda: run_nccl_allreduce_ngpu(num_gpus))
 
 
 @app.local_entrypoint()
 def main():
     """Run the benchmark and optionally write result to local results/."""
-    out = run_nccl_allreduce_8gpu.remote()
-    results_dir = Path(__file__).parent / "results"
-    results_dir.mkdir(exist_ok=True)
-    out_path = results_dir / "results_8gpu_allreduce.txt"
+    parser = argparse.ArgumentParser(description='Run NCCL all-reduce benchmark on Modal with configurable GPU architecture and count.')
+    parser.add_argument('--arch', type=str, default='A100', help='GPU architecture to use (e.g., A100, L40S)')
+    parser.add_argument('--gpus', type=int, default=8, help='Number of GPUs to use (default: 8)')
+    args = parser.parse_args()
+    arch = args.arch.upper()
+    num_gpus = args.gpus
+
+    modal_func = make_modal_function(arch, num_gpus)
+    out = modal_func.remote()
+    results_dir = Path(__file__).parent / "results" / f"{arch.lower()}-{num_gpus}gpu-results"
+    results_dir.mkdir(parents=True, exist_ok=True)
+    out_path = results_dir / "results.txt"
     out_path.write_text(out)
-    print(f"Wrote {out_path}")
+    print(f"Wrote results to: {out_path}")

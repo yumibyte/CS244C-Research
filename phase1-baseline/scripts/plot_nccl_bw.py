@@ -122,32 +122,31 @@ def print_summary(sizes, oop_bw, ip_bw):
 
 if __name__ == "__main__":
 
-    ####################################
-    # parameters for configuring!
-    ####################################
-    title = "NCCL All-Reduce Bandwidth (8x A100)"
+    import argparse
+    import os
+    parser = argparse.ArgumentParser(description='Parse NCCL test results and plot bandwidth graphs.')
+    parser.add_argument('input_file', type=str, help='Input NCCL results txt file')
+    parser.add_argument('--output_dir', type=str, default='bandwidth_graphs', help='Output directory for plots')
+    parser.add_argument('--arch', type=str, default='', help='GPU architecture label for plot titles')
+    args = parser.parse_args()
 
-    if len(sys.argv) < 2:
-        print("Usage: python plot_nccl_bw.py <nccl_input_file>")
-        sys.exit(1)
-    
-    filename = sys.argv[1]
-    
+    filename = args.input_file
+    output_dir = args.output_dir
+    arch_label = args.arch
+    os.makedirs(output_dir, exist_ok=True)
+    base = os.path.splitext(os.path.basename(filename))[0]
+
     # Parse data
     sizes, oop_bw, ip_bw = parse_nccl_output(filename)
-    
     if len(sizes) == 0:
         print("Error: No data found in file")
         sys.exit(1)
-    
+
     # Print summary
     print_summary(sizes, oop_bw, ip_bw)
-    
-    # Create plots
-    import os
-    output_dir = "bandwidth_graphs"
-    os.makedirs(output_dir, exist_ok=True)
-    base = os.path.splitext(os.path.basename(filename))[0]
+
+    # Plot titles
+    title = f"NCCL All-Reduce Bandwidth {arch_label}" if arch_label else "NCCL All-Reduce Bandwidth"
 
     # Combined plot (both curves)
     fig_combined = plot_bandwidth(sizes, oop_bw, ip_bw, title=title)
@@ -156,13 +155,13 @@ if __name__ == "__main__":
     print(f"\nCombined plot saved to: {output_file_combined}")
 
     # Out-of-place only
-    fig_oop = plot_single_bandwidth(sizes, oop_bw, 'Out-of-place', f"NCCL Out-of-place Bandwidth ({base})")
+    fig_oop = plot_single_bandwidth(sizes, oop_bw, 'Out-of-place', f"NCCL Out-of-place Bandwidth {arch_label} ({base})")
     output_file_oop = os.path.join(output_dir, f"{base}_out_of_place_bw.png")
     fig_oop.savefig(output_file_oop, dpi=300, bbox_inches='tight')
     print(f"Out-of-place plot saved to: {output_file_oop}")
 
     # In-place only
-    fig_ip = plot_single_bandwidth(sizes, ip_bw, 'In-place', f"NCCL In-place Bandwidth ({base})")
+    fig_ip = plot_single_bandwidth(sizes, ip_bw, 'In-place', f"NCCL In-place Bandwidth {arch_label} ({base})")
     output_file_ip = os.path.join(output_dir, f"{base}_in_place_bw.png")
     fig_ip.savefig(output_file_ip, dpi=300, bbox_inches='tight')
     print(f"In-place plot saved to: {output_file_ip}")
