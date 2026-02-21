@@ -1,10 +1,43 @@
 ## SSH into farmshare
-`ssh raigosa@login.farmshare.stanford.edu`
+`ssh [sunet]@login.farmshare.stanford.edu`
 
 ### Good to know functions for farmshare
-View resources I've queued: `squeue -u raigosa`
+View resources I've queued: `squeue -u [sunet]`
 
-## Requesting nodes on farmshare
+## Requesting 4 GPUs on farmshare
+`srun --partition=gpu --gres=gpu:4 --nodes=1 --pty bash`
+
+*This will result in receiving 4 L40s GPUs.*
+
+Running `nvidia-smi topo -m` will provide:
+*The TLDR:*
+- GPU<->GPU communication is via PCIe and the interconnect between PCIe Host Bridges within a NUMA node (NODE).
+```
+        GPU0    GPU1    GPU2    GPU3    NIC0    NIC1    CPU Affinity    NUMA Affinity   GPU NUMA ID
+GPU0     X      NODE    NODE    NODE    NODE    NODE    0,40    0               N/A
+GPU1    NODE     X      NODE    NODE    NODE    NODE    0,40    0               N/A
+GPU2    NODE    NODE     X      NODE    NODE    NODE            1               N/A
+GPU3    NODE    NODE    NODE     X      NODE    NODE            1               N/A
+NIC0    NODE    NODE    NODE    NODE     X      PIX
+NIC1    NODE    NODE    NODE    NODE    PIX      X 
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+NIC Legend:
+
+  NIC0: mlx5_0
+  NIC1: mlx5_1
+```
+
+## Requesting 2 GPUs on farmshare
 `srun --partition=gpu --gres=gpu:2 --nodes=1 --pty bash`
 provides the following result for `nvidia-smi`:
 Mon Feb  9 15:35:44 2026       
@@ -60,7 +93,7 @@ NIC Legend:
 ```
 
 ## Setting up the first nvcc experiment
-`module load cuda/12.9.0` --> made it available on `which vncc`
+`module load cuda/12.9.0` --> made it available on `which nvcc`
 `export CUDA_HOME=$(dirname $(dirname $(which nvcc)))` --> setup CUDA_HOME
 `export NCCL_HOME="$CONDA_PREFIX"`
 `export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH` --> make the cuda module available to run the build

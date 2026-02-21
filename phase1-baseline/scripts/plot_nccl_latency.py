@@ -1,4 +1,6 @@
 import re
+import matplotlib
+matplotlib.use("Agg")  # non-interactive backend for saving without display
 import matplotlib.pyplot as plt
 import argparse
 import os
@@ -27,16 +29,19 @@ def parse_nccl_results(filename):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parse NCCL test results and plot latency graphs.')
     parser.add_argument('input_file', type=str, help='Input NCCL results txt file')
+    parser.add_argument('--output_dir', type=str, default='latency_graphs', help='Output directory for plots')
+    parser.add_argument('--arch', type=str, default='', help='GPU architecture label for plot titles')
     args = parser.parse_args()
 
     filename = args.input_file
+    output_dir = args.output_dir
+    arch_label = args.arch
     sizes, out_times, in_times = parse_nccl_results(filename)
     print("Sizes:", sizes)
     print("Out-of-place times:", out_times)
     print("In-place times:", in_times)
 
     # Create output directory if it doesn't exist
-    output_dir = "latency_graphs"
     os.makedirs(output_dir, exist_ok=True)
 
     # Use input file base name for output
@@ -50,7 +55,8 @@ if __name__ == "__main__":
     plt.xlabel('Message Size (Bytes)')
     plt.ylabel('Latency (us)')
     plt.xscale('log')
-    plt.title('NCCL AllReduce Out-of-place Latency vs Message Size')
+    title_oop = f'NCCL AllReduce Out-of-place Latency vs Message Size {arch_label}' if arch_label else 'NCCL AllReduce Out-of-place Latency vs Message Size'
+    plt.title(title_oop)
     plt.grid(True)
     plt.savefig(os.path.join(output_dir, out_of_place_png))
     plt.close()
@@ -61,7 +67,8 @@ if __name__ == "__main__":
     plt.xlabel('Message Size (Bytes)')
     plt.ylabel('Latency (us)')
     plt.xscale('log')
-    plt.title('NCCL AllReduce In-place Latency vs Message Size')
+    title_ip = f'NCCL AllReduce In-place Latency vs Message Size {arch_label}' if arch_label else 'NCCL AllReduce In-place Latency vs Message Size'
+    plt.title(title_ip)
     plt.grid(True)
     plt.savefig(os.path.join(output_dir, in_place_png))
     plt.close()
