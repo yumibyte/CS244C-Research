@@ -58,15 +58,19 @@ The `run_nccl_farmshare.sh` script will automatically activate the environment f
 From this directory, run:
 
 ```bash
-./run_nccl_farmshare.sh <NUM_GPUS>
+./run_nccl_farmshare.sh <NUM_GPUS> <ALGORITHMS> [PROTOCOL]
 ```
 
-- `<NUM_GPUS>`: Number of L40S GPUs to use (e.g., `2`, `4`)
+- `<NUM_GPUS>`: Number of GPUs to use (e.g., `2`, `4`)
+- `<ALGORITHMS>`: Comma-separated list of NCCL algorithms (can be `ring,tree`) or `auto` for automatic selection. If you do `ring,tree`, it will run both algorithms and save results separately.
+- `[PROTOCOL]`: Optional. NCCL protocol to use (`ll128`, `ll`, `simple`). Select only one
 
-Example:
+Examples:
 
 ```bash
-./run_nccl_farmshare.sh 2
+./run_nccl_farmshare.sh 2 auto
+./run_nccl_farmshare.sh 4 ring,tree ll128
+./run_nccl_farmshare.sh 4 ring ll
 ```
 
 > [!NOTE] farmshare only allows up to 4 GPUs
@@ -95,6 +99,7 @@ Ensure that you have passed the number of gpus as an argument when running the s
 
 It expects to be run within the `scripts/` directory of the `phase1-baseline/` directory. Make sure you are in the correct directory before executing the script.
 
+
 # Plotting Results
 
 Use the plotting scripts to visualize bandwidth and latency:
@@ -111,8 +116,11 @@ python plot_nccl_latency.py ../results/results_a100_8gpu_allreduce.txt --arch "A
 ```
 Output: Plots are written to `latency_graphs/` in this directory.
 
-# Summary
+**Multi-line plotting:**
+To compare results from multiple folders in a single plot:
+```bash
+python plot_nccl_multi.py ../folder1 ../folder2 --output_dir multi_graphs --arch "l40s-2gpu"
+```
+Output: Plots are written to `multi_graphs/` in this directory, with filenames and plot titles reflecting the input folders. It will generate a multi-line plot for latency and bandwidth.
 
-- You can run NCCL benchmarks for any GPU configuration using `run_modal.py`.
-- Results are saved in a standardized format for easy plotting and comparison.
-- Use the plotting scripts to generate bandwidth and latency graphs for your experiments.
+Note that in the folders you designate, it will grab the .txt file corresponding to the nccl-test output.
