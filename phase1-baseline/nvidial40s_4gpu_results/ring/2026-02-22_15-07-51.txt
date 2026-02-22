@@ -1,0 +1,45 @@
+# nccl-tests version 2.17.9 nccl-headers=22902 nccl-library=22902
+# Collective test starting: all_reduce_perf
+# nThread 1 nGpus 4 minBytes 8 maxBytes 134217728 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 1176121 on     oat-04 device  0 [0000:4a:00] NVIDIA L40S
+#  Rank  1 Group  0 Pid 1176121 on     oat-04 device  1 [0000:61:00] NVIDIA L40S
+#  Rank  2 Group  0 Pid 1176121 on     oat-04 device  2 [0000:ca:00] NVIDIA L40S
+#  Rank  3 Group  0 Pid 1176121 on     oat-04 device  3 [0000:e1:00] NVIDIA L40S
+NCCL version 2.29.2+cuda13.1
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong 
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)         
+           8             2     float     sum      -1    17.29    0.00    0.00       0    17.78    0.00    0.00       0
+          16             4     float     sum      -1    18.41    0.00    0.00       0    17.00    0.00    0.00       0
+          32             8     float     sum      -1    16.97    0.00    0.00       0    17.13    0.00    0.00       0
+          64            16     float     sum      -1    17.44    0.00    0.01       0    17.09    0.00    0.01       0
+         128            32     float     sum      -1    17.24    0.01    0.01       0    17.47    0.01    0.01       0
+         256            64     float     sum      -1    17.40    0.01    0.02       0    17.10    0.01    0.02       0
+         512           128     float     sum      -1    17.31    0.03    0.04       0    17.15    0.03    0.04       0
+        1024           256     float     sum      -1    17.05    0.06    0.09       0    17.30    0.06    0.09       0
+        2048           512     float     sum      -1    17.31    0.12    0.18       0    17.08    0.12    0.18       0
+        4096          1024     float     sum      -1    17.23    0.24    0.36       0    17.54    0.23    0.35       0
+        8192          2048     float     sum      -1    17.19    0.48    0.71       0    17.19    0.48    0.71       0
+       16384          4096     float     sum      -1    17.34    0.94    1.42       0    17.67    0.93    1.39       0
+       32768          8192     float     sum      -1    18.37    1.78    2.68       0    17.67    1.85    2.78       0
+       65536         16384     float     sum      -1    23.10    2.84    4.26       0    22.84    2.87    4.30       0
+      131072         32768     float     sum      -1    36.67    3.57    5.36       0    36.12    3.63    5.44       0
+      262144         65536     float     sum      -1    67.82    3.87    5.80       0    65.75    3.99    5.98       0
+      524288        131072     float     sum      -1    88.29    5.94    8.91       0    87.69    5.98    8.97       0
+     1048576        262144     float     sum      -1   129.80    8.08   12.12       0   127.00    8.26   12.38       0
+     2097152        524288     float     sum      -1   220.27    9.52   14.28       0   218.29    9.61   14.41       0
+     4194304       1048576     float     sum      -1   411.40   10.20   15.29       0   409.73   10.24   15.36       0
+     8388608       2097152     float     sum      -1   817.83   10.26   15.39       0   818.86   10.24   15.37       0
+    16777216       4194304     float     sum      -1  1674.16   10.02   15.03       0  1680.85    9.98   14.97       0
+    33554432       8388608     float     sum      -1  3331.68   10.07   15.11       0  3321.06   10.10   15.16       0
+    67108864      16777216     float     sum      -1  6602.52   10.16   15.25       0  6557.05   10.23   15.35       0
+   134217728      33554432     float     sum      -1  13060.7   10.28   15.41       0  13013.1   10.31   15.47       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 5.92959 
+#
+# Collective test concluded: all_reduce_perf
+#
+
