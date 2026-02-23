@@ -22,6 +22,7 @@ def plot_multi_bandwidth(folder_files, output_dir, arch_label=""):
     fig, ax = plt.subplots(figsize=(12, 6))
     folder_names = list(folder_files.keys())
     folder_label = '_'.join(folder_names)
+    arch_suffix = f"_{arch_label}" if arch_label else ""
     for folder, files in folder_files.items():
         for f in files:
             sizes, oop_bw, ip_bw = parse_bw(f)
@@ -40,7 +41,7 @@ def plot_multi_bandwidth(folder_files, output_dir, arch_label=""):
     ax.set_xscale('log')
     plt.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"multi_bw_plot_{folder_label}.png")
+    output_file = os.path.join(output_dir, f"multi_bw_plot_{folder_label}{arch_suffix}.png")
     fig.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"Multi-bandwidth plot saved to: {output_file}")
 
@@ -48,6 +49,7 @@ def plot_multi_latency(folder_files, output_dir, arch_label=""):
     fig, ax = plt.subplots(figsize=(12, 6))
     folder_names = list(folder_files.keys())
     folder_label = '_'.join(folder_names)
+    arch_suffix = f"_{arch_label}" if arch_label else ""
     for folder, files in folder_files.items():
         for f in files:
             sizes, out_times, in_times = parse_latency(f)
@@ -66,7 +68,7 @@ def plot_multi_latency(folder_files, output_dir, arch_label=""):
     ax.set_xscale('log')
     plt.tight_layout()
     os.makedirs(output_dir, exist_ok=True)
-    output_file = os.path.join(output_dir, f"multi_latency_plot_{folder_label}.png")
+    output_file = os.path.join(output_dir, f"multi_latency_plot_{folder_label}{arch_suffix}.png")
     fig.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"Multi-latency plot saved to: {output_file}")
 
